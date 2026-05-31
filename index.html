@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Callista 占卜小舖</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Georgia', serif; background: #F5EFE6; min-height: 100vh; padding: 2rem 1rem 4rem; }
+
+  :root {
+    --br-50: #FAF6F1;
+    --br-100: #F0E8DC;
+    --br-200: #DEC9B0;
+    --br-400: #B8916A;
+    --br-600: #8B5E3C;
+    --br-800: #5C3820;
+    --br-900: #3A2010;
+    --br-text: #4A2E18;
+    --br-muted: #8B7260;
+    --br-hint: #B8A898;
+    --br-card: #FDFAF6;
+    --br-border: rgba(139,94,60,0.15);
+    --br-border-md: rgba(139,94,60,0.28);
+    --br-tag-bg: #F0E8DC;
+    --br-tag-text: #5C3820;
+  }
+
+  .page { max-width: 680px; margin: 0 auto; background: var(--br-50); border-radius: 20px; padding: 2.5rem 1.5rem 3rem; border: 0.5px solid var(--br-border-md); }
+
+  .header { text-align: center; margin-bottom: 2.2rem; }
+  .header-deco { color: var(--br-400); font-size: 14px; letter-spacing: 6px; margin-bottom: 8px; }
+  .shop-name { font-size: 28px; font-weight: normal; color: var(--br-800); letter-spacing: 4px; }
+  .shop-sub { font-size: 12px; color: var(--br-muted); margin-top: 6px; letter-spacing: 4px; font-family: sans-serif; }
+  .divider { width: 80px; height: 0.5px; background: var(--br-200); margin: 14px auto; }
+  .header-hint { font-size: 12px; color: var(--br-hint); font-family: sans-serif; letter-spacing: 0.5px; }
+
+  .section { margin-bottom: 2rem; }
+  .section-title { font-size: 11px; font-weight: 500; color: var(--br-muted); letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 10px; padding-left: 2px; font-family: sans-serif; }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+  .price-card { background: var(--br-card); border: 0.5px solid var(--br-border); border-radius: 12px; padding: 14px 12px; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+  .price-card:hover { border-color: var(--br-border-md); background: var(--br-100); }
+  .price-card.wide { grid-column: span 2; }
+  .card-name { font-size: 13px; color: var(--br-text); font-weight: normal; line-height: 1.5; margin-bottom: 8px; font-family: sans-serif; }
+  .card-price { font-size: 18px; color: var(--br-600); }
+  .card-price-small { font-size: 13px; color: var(--br-600); line-height: 1.8; font-family: sans-serif; }
+  .card-tag { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 20px; background: var(--br-tag-bg); color: var(--br-tag-text); margin-bottom: 7px; border: 0.5px solid var(--br-border); font-family: sans-serif; }
+
+  .footer-note { text-align: center; margin-top: 1.5rem; font-size: 11px; color: var(--br-hint); letter-spacing: 1.5px; font-family: sans-serif; }
+
+  /* Modal overlay */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(58,32,16,0.42); z-index: 999; align-items: center; justify-content: center; padding: 1.5rem; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--br-card); border-radius: 18px; border: 0.5px solid var(--br-border-md); max-width: 480px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 1.75rem; position: relative; }
+  .modal-close { position: absolute; top: 14px; right: 16px; background: none; border: none; cursor: pointer; color: var(--br-hint); font-size: 22px; line-height: 1; font-family: sans-serif; }
+  .modal-close:hover { color: var(--br-muted); }
+  .modal-tag { display: inline-block; font-size: 11px; padding: 3px 10px; border-radius: 20px; background: var(--br-tag-bg); color: var(--br-tag-text); border: 0.5px solid var(--br-border); margin-bottom: 12px; font-family: sans-serif; }
+  .modal-title { font-size: 20px; font-weight: normal; color: var(--br-800); margin-bottom: 6px; }
+  .modal-price { font-size: 22px; color: var(--br-600); margin-bottom: 16px; font-family: sans-serif; }
+  .modal-desc { font-size: 14px; color: var(--br-muted); line-height: 1.85; margin-bottom: 18px; white-space: pre-wrap; font-family: sans-serif; }
+  .modal-q-title { font-size: 11px; font-weight: 500; color: var(--br-hint); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; font-family: sans-serif; }
+  .modal-q-item { font-size: 13px; color: var(--br-text); line-height: 1.65; padding: 7px 0; border-bottom: 0.5px solid var(--br-border); font-family: sans-serif; }
+  .modal-q-item:last-child { border-bottom: none; }
+  .modal-questions { margin-bottom: 20px; }
+  .book-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 13px; background: var(--br-600); color: #FAF6F1; border: none; border-radius: 10px; font-size: 15px; cursor: pointer; text-decoration: none; transition: background 0.15s; font-family: sans-serif; letter-spacing: 0.5px; }
+  .book-btn:hover { background: var(--br-800); }
+  .book-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+  @media (max-width: 480px) {
+    .page { padding: 2rem 1rem 2.5rem; }
+    .card-grid { grid-template-columns: repeat(2, 1fr); }
+    .price-card.wide { grid-column: span 2; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="header">
+    <div class="header-deco">✦ ✦ ✦</div>
+    <div class="shop-name">Callista</div>
+    <div class="shop-sub">占 卜 小 舖</div>
+    <div class="divider"></div>
+    <div class="header-hint">點擊任一項目查看詳細說明及預約</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">愛情占卜</div>
+    <div class="card-grid">
+      <div class="price-card" onclick="openModal('love1')">
+        <div class="card-name">簡易愛情占卜</div>
+        <div class="card-price">$100</div>
+      </div>
+      <div class="price-card" onclick="openModal('love2')">
+        <div class="card-name">深層探視愛情占卜</div>
+        <div class="card-price">$300</div>
+      </div>
+      <div class="price-card" onclick="openModal('love3')">
+        <div class="card-name">全面事件分析愛情占卜</div>
+        <div class="card-price">$380</div>
+      </div>
+      <div class="price-card" onclick="openModal('love4')">
+        <div class="card-name">自我靈魂與精神狀態療癒</div>
+        <div class="card-price">$480</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">特殊專區</div>
+    <div class="card-grid">
+      <div class="price-card" onclick="openModal('ambig')">
+        <div class="card-tag">8 題</div>
+        <div class="card-name">曖昧專區</div>
+        <div class="card-price">$2,200</div>
+      </div>
+      <div class="price-card" onclick="openModal('back')">
+        <div class="card-tag">7 / 12 題</div>
+        <div class="card-name">復合專區</div>
+        <div class="card-price-small">$1,900 / 7題<br>$2,900 / 12題</div>
+      </div>
+      <div class="price-card" onclick="openModal('nc')">
+        <div class="card-tag">10 題</div>
+        <div class="card-name">斷聯專區</div>
+        <div class="card-price">$2,200</div>
+      </div>
+      <div class="price-card" onclick="openModal('dark')">
+        <div class="card-tag">7 題</div>
+        <div class="card-name">黑暗專區</div>
+        <div class="card-price">$2,200</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">事業占卜</div>
+    <div class="card-grid">
+      <div class="price-card" onclick="openModal('biz1')">
+        <div class="card-name">簡易事業占卜</div>
+        <div class="card-price">$100</div>
+      </div>
+      <div class="price-card" onclick="openModal('biz2')">
+        <div class="card-name">全面分析事業占卜</div>
+        <div class="card-price">$380</div>
+      </div>
+      <div class="price-card" onclick="openModal('biz3')">
+        <div class="card-name">道路 2 擇 1 占卜</div>
+        <div class="card-price">$666</div>
+      </div>
+      <div class="price-card" onclick="openModal('biz4')">
+        <div class="card-name">道路多擇 1 占卜</div>
+        <div class="card-price">$888</div>
+      </div>
+      <div class="price-card wide" onclick="openModal('biz5')">
+        <div class="card-name">事業運占卜（年度）</div>
+        <div class="card-price">$2,500</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">✦ &nbsp; 所有方案可客製化，如有疑問歡迎 IG 私訊詢問 &nbsp; ✦</div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeOnOverlay(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()" aria-label="關閉">✕</button>
+    <div class="modal-tag" id="m-tag"></div>
+    <div class="modal-title" id="m-title"></div>
+    <div class="modal-price" id="m-price"></div>
+    <div class="modal-desc" id="m-desc"></div>
+    <div class="modal-questions" id="m-questions" style="display:none">
+      <div class="modal-q-title" id="m-q-title">題目內容</div>
+      <div id="m-q-list"></div>
+    </div>
+    <a href="https://www.instagram.com/callista_a_a/" target="_blank" class="book-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+        <circle cx="12" cy="12" r="4"/>
+        <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
+      </svg>
+      立即 IG 線上預約 &nbsp;@callista_a_a
+    </a>
+  </div>
+</div>
+
+<script>
+const data = {
+  love1:{tag:'愛情占卜',title:'簡易愛情占卜',price:'$100',desc:'使用小牌陣了解未來狀況，以及給予簡略建議。適合想快速了解感情走向的你。',questions:[]},
+  love2:{tag:'愛情占卜',title:'深層探視愛情占卜',price:'$300',desc:'深入了解他對你的想法、探視現在發展為何不順利及未來發展情況。',questions:[]},
+  love3:{tag:'愛情占卜',title:'全面事件分析愛情占卜',price:'$380',desc:'深入了解他對你的想法、分析第三方的影響力，利用完整大牌陣來看未來發展，且附上完整建議。',questions:[]},
+  love4:{tag:'愛情占卜',title:'自我靈魂與精神狀態療癒',price:'$480',desc:'深入了解他對你的想法、分析第三方的影響力，利用完整大牌陣來看未來發展。同時了解潛意識自己對感情的看法及靈魂狀態。\n\n皆附上完整建議。',questions:[]},
+  ambig:{tag:'特殊專區 · 8題',title:'曖昧專區',price:'$2,200',desc:'適合正在曖昧關係中的你，總共 8 題（可客製化、題數不可刪減）。',questions:['他目前對我的想法如何，有機會在一起嗎？','除了我以外，還有其他的曖昧對象嗎？','跟其他曖昧對象比，他對我的喜歡大概占幾分？','窺探他的內心（陷入愛情的他會是什麼模樣）','他的黑暗面剖析','他想對你說的話','我們的未來故事走向','他喜歡我什麼／討厭我什麼']},
+  back:{tag:'特殊專區 · 7/12題',title:'復合專區',price:'$1,900（7題）／ $2,900（12題）',desc:'● 7題方案：適合已分手、和對方有保持聯絡的你。\n● 12題方案：適合已分手、完全沒有聯絡的你。\n\n兩種方案皆可客製化，題數不可刪減。',qTitle:'12 題版本（含斷聯題目）',questions:['現階段的我們有機會復合嗎？','未來的我們有機會復合嗎？','他和他的對象發展的怎麼樣？','把問題解決之後，他會回頭喜歡我嗎？','斷聯之後他有想我嗎？（12題版）','斷聯之後我們還有機會復合嗎？（12題版）','斷聯之後還能當朋友嗎？（12題版）','他以前 vs 斷聯後對我的想法（12題版）','目前斷聯，之後有機會來找我嗎？（12題版）','窺探他的內心（外在和內在）','他的黑暗面剖析','他不敢講卻想對你說的話']},
+  nc:{tag:'特殊專區 · 10題',title:'斷聯專區',price:'$2,200',desc:'適合曾經曖昧並且現在沒有聯絡的你，總共 10 題（可客製化、題數不可刪減）。',questions:['斷聯之後他有想我嗎？','斷聯之後我們還有機會聯繫上嗎？','斷聯之後還能當朋友嗎？','他以前對我的想法 VS 現在對我的想法','他的黑暗面剖析','他不敢講卻想對你說的話','成為朋友之後有機會變成戀人嗎？','他現在跟他的對象過的如何','目前的他是單身還是有曖昧對象？','如果自己的價值提高之後，他會喜歡我嗎？']},
+  dark:{tag:'特殊專區 · 7題',title:'黑暗專區',price:'$2,200',desc:'適合在愛情上處於未定義關係的你，總共 7 題（可客製化、題數不可刪減）。',questions:['有另外一半的他正在跟你曖昧，有機會變成正緣嗎？','目前只有肉體關係，未來能發展成正緣嗎？','雙方都有伴侶，如果跟現在的伴侶分開有機會嗎？','跟他的愛能昇華比普通愛情更高嗎？','禁忌之戀有機會發展嗎？','兩方能無縫接軌嗎？','對方是否想和你精神出軌？']},
+  biz1:{tag:'事業占卜',title:'簡易事業占卜',price:'$100',desc:'使用小牌陣了解未來狀況，以及給予簡略建議。',questions:[]},
+  biz2:{tag:'事業占卜',title:'全面分析事業占卜',price:'$380',desc:'深入了解此事業問題對你造成的影響，利用完整大牌陣來看未來發展，且附上完整建議。',questions:[]},
+  biz3:{tag:'事業占卜',title:'道路 2 擇 1 占卜',price:'$666',desc:'使用牌陣了解當下選擇職業 A 和職業 B 對你未來的影響，並客觀比較這兩條道路的各自優缺點，最後給予建議。',questions:[]},
+  biz4:{tag:'事業占卜',title:'道路多擇 1 占卜',price:'$888',desc:'使用牌陣了解心態對於事業的影響，建議對於未來迷茫的人選擇此項占卜。客觀比較多條道路各自優缺點、看看轉換跑道是否對自己身心有益，並給予建議。',questions:[]},
+  biz5:{tag:'事業占卜 · 年度',title:'事業運占卜',price:'$2,500',desc:'了解一整年的事業運如何，例如有哪些月份會遇到小人、哪些月份該謹慎投資，看到個別特殊訊息也會告知。',questions:[]}
+};
+
+function openModal(key) {
+  const d = data[key];
+  document.getElementById('m-tag').textContent = d.tag;
+  document.getElementById('m-title').textContent = d.title;
+  document.getElementById('m-price').textContent = d.price;
+  document.getElementById('m-desc').textContent = d.desc;
+  const qSection = document.getElementById('m-questions');
+  const qList = document.getElementById('m-q-list');
+  document.getElementById('m-q-title').textContent = d.qTitle || '題目內容';
+  if (d.questions && d.questions.length > 0) {
+    qSection.style.display = 'block';
+    qList.innerHTML = d.questions.map((q,i) => `<div class="modal-q-item">${i+1}. ${q}</div>`).join('');
+  } else {
+    qSection.style.display = 'none';
+  }
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+function closeOnOverlay(e) { if (e.target === document.getElementById('modal-overlay')) closeModal(); }
+</script>
+</body>
+</html>
